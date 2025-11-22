@@ -31,10 +31,17 @@ jobs:
           docker build -t ghcr.io/$OWNER/airflow:${{ github.sha }} .
 
 
+      # - name: Push Docker image
+      #   run: |
+      #     IMAGE="ghcr.io/${{ github.repository_owner }}/airflow:${{ github.sha }}"
+      #     docker push $IMAGE
+
       - name: Push Docker image
         run: |
-          IMAGE="ghcr.io/${{ github.repository_owner }}/airflow:${{ github.sha }}"
-          docker push $IMAGE
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          IMAGE="ghcr.io/$OWNER/airflow:${{ github.sha }}"
+          docker push "$IMAGE"
+
 
       # - name: Output image tag
       #   run: echo "Image pushed: ghcr.io/${{ github.repository_owner }}/airflow:${{ github.sha }}"

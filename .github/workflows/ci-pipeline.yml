@@ -22,14 +22,20 @@ jobs:
 
       - name: Build Docker image
         run: |
-          IMAGE="ghcr.io/${{ github.repository }}/airflow:${{ github.sha }}"
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          REPO=$(echo "${{ github.repository }}" | cut -d'/' -f2 | tr '[:upper:]' '[:lower:]')
+          IMAGE="ghcr.io/$OWNER/$REPO/airflow:${{ github.sha }}"
           docker build -t "$IMAGE" .
 
       - name: Push Docker image
         run: |
-          IMAGE="ghcr.io/${{ github.repository }}/airflow:${{ github.sha }}"
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          REPO=$(echo "${{ github.repository }}" | cut -d'/' -f2 | tr '[:upper:]' '[:lower:]')
+          IMAGE="ghcr.io/$OWNER/$REPO/airflow:${{ github.sha }}"
           docker push "$IMAGE"
 
       - name: Output image tag
         run: |
-          echo "Image pushed: ghcr.io/${{ github.repository }}/airflow:${{ github.sha }}"
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          REPO=$(echo "${{ github.repository }}" | cut -d'/' -f2 | tr '[:upper:]' '[:lower:]')
+          echo "Image pushed: ghcr.io/$OWNER/$REPO/airflow:${{ github.sha }}"

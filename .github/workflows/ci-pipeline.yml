@@ -32,4 +32,6 @@ jobs:
           docker push "$IMAGE"
 
       - name: Output image tag
-        run: echo "Image pushed: ghcr.io/${{ github.repository_owner }}/airflow:${{ github.sha }}"
+        run: |
+          echo "Image pushed: ghcr.io/${{ github.repository_owner }}/airflow:${{ github.sha }}"
+

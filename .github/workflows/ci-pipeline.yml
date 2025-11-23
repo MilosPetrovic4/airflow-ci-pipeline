@@ -39,3 +39,38 @@ jobs:
           OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           REPO=$(echo "${{ github.repository }}" | cut -d'/' -f2 | tr '[:upper:]' '[:lower:]')
           echo "Image pushed: ghcr.io/$OWNER/$REPO/airflow:${{ github.sha }}"
+
+
+
+  deploy:
+    name: Deploy to Kubernetes
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Set up kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
+          chmod 600 ~/.kube/config
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+
+      - name: Deploy Airflow with Helm
+        run: |
+          IMAGE="${{ needs.build.outputs.image }}"
+          echo "Deploying image: $IMAGE"
+
+          helm upgrade --install airflow ./helm \
+            --namespace airflow \
+            --create-namespace \
+            --set images.airflow.repository="${IMAGE%:*}" \
+            --set images.airflow.tag="${IMAGE##*:}" \
+            -f ./helm/values.yaml
